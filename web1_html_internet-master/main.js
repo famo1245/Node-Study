@@ -5,8 +5,18 @@ const qs = require('querystring');
 const template = require('./lib/template');
 const path = require('path');
 const sanitizeHtml = require('sanitize-html');
+const mysql = require('mysql');
 
 const dirName = './data';
+const db = mysql.createConnection({
+  host: 'localhost',
+  user: 'root',
+  password: 'famo1245',
+  database: 'opentutorials',
+});
+
+db.connect();
+
 const app = http.createServer((request, response) => {
   let _url = request.url;
   // url 모듈의 parse 사용, 쿼리 스트링만 추출함
@@ -19,10 +29,14 @@ const app = http.createServer((request, response) => {
 
   if (pathname === '/') {
     if (queryData.id === undefined) {
-      fs.readdir(dirName, (err, fileList) => {
+      db.query('SELECT * FROM topic', (err, topics) => {
+        if (err) {
+          throw err;
+        }
+
         const title = 'Welcome';
         const description = 'Hello, Node.js';
-        const list = template.List(fileList);
+        const list = template.List(topics);
         const html = template.HTML(
           title,
           list,
@@ -33,35 +47,49 @@ const app = http.createServer((request, response) => {
         response.end(html);
       });
     } else {
-      fs.readdir(dirName, (err, fileList) => {
-        const filteredId = path.parse(queryData.id).base;
-        fs.readFile(`data/${filteredId}`, 'utf8', (err, description) => {
-          const title = queryData.id;
-          const sanitizedTitle = sanitizeHtml(title);
-          const sanitizedDescription = sanitizeHtml(description, {
-            allowedTags: ['h1'],
-          });
-          const list = template.List(fileList);
-          const html = template.HTML(
-            sanitizedTitle,
-            list,
-            `<h2>${title}</h2><p>${sanitizedDescription}</p>`,
-            `<a href="/create">create</a>
-            <a href="/update?id=${sanitizedTitle}">update</a>
+      db.query('SELECT * FROM topic', (err, topics) => {
+        if (err) {
+          throw err;
+        }
+
+        db.query(
+          `SELECT * FROM topic LEFT JOIN author ON topic.author_id=author.id
+          WHERE topic.id=?`,
+          [queryData.id],
+          (err2, topic) => {
+            if (err2) {
+              throw err2;
+            }
+
+            const title = topic[0].title;
+            const description = topic[0].description;
+            const list = template.List(topics);
+            const html = template.HTML(
+              title,
+              list,
+              `<h2>${title}</h2>
+              <p>${description}</p><p>by ${topic[0].name}</p>`,
+              `<a href="/create">create</a>
+            <a href="/update?id=${queryData.id}">update</a>
             <form action="delete_process" method="post" onsubmit="return confirm('정말로 삭제하시겠습니까?');">
-              <input type="hidden" name="id" value="${sanitizedTitle}" />
+              <input type="hidden" name="id" value="${queryData.id}" />
               <input type="submit" value="delete" />
             </form>`
-          );
-          response.writeHead(200);
-          response.end(html);
-        });
+            );
+            response.writeHead(200);
+            response.end(html);
+          }
+        );
       });
     }
   } else if (pathname === '/create') {
-    fs.readdir(dirName, (err, fileList) => {
+    db.query('SELECT * FROM topic', (err, topics) => {
+      if (err) {
+        throw err;
+      }
+
       const title = 'WEB - create';
-      const list = template.List(fileList);
+      const list = template.List(topics);
       const html = template.HTML(
         title,
         list,
@@ -76,7 +104,7 @@ const app = http.createServer((request, response) => {
       </p>
     </form>
     `,
-        ''
+        `<a href="/create">create</a>`
       );
       response.writeHead(200);
       response.end(html);
@@ -91,22 +119,38 @@ const app = http.createServer((request, response) => {
       post = qs.parse(body);
       const title = post.title;
       const description = post.description;
-      fs.writeFile(`data/${title}`, description, 'utf8', (err) => {
-        response.writeHead(302, { Location: `/?id=${title}` });
-        response.end();
-      });
+      db.query(
+        `INSERT INTO topic (title, description, created, author_id)
+          VALUES(?, ?, NOW(), ?)`,
+        [title, description, 1],
+        (err, result) => {
+          if (err) {
+            throw err;
+          }
+          response.writeHead(302, { Location: `/?id=${result.insertId}` });
+          response.end();
+        }
+      );
     });
   } else if (pathname === '/update') {
-    fs.readdir('./data', (err, fileList) => {
-      const filteredId = path.parse(queryData.id).base;
-      fs.readFile(`data/${filteredId}`, 'utf8', (err, description) => {
-        const title = queryData.id;
-        const list = template.List(fileList);
+    db.query('SELECT * FROM topic', (err, topics) => {
+      if (err) {
+        throw err;
+      }
+
+      db.query(`SELECT * FROM topic WHERE id=?`, [queryData.id], (err2, topic) => {
+        if (err2) {
+          throw err2;
+        }
+
+        const title = topic[0].title;
+        const description = topic[0].description;
+        const list = template.List(topics);
         const html = template.HTML(
           title,
           list,
           `<form action="/update_process" method="post">
-          <input type="hidden" name="id" value="${title}">
+          <input type="hidden" name="id" value="${topic[0].id}">
           <p><input type="text" name="title" placeholder="title" value="${title}" /></p>
           <p>
             <textarea name="description" placeholder="description" >${description}</textarea>
@@ -115,7 +159,7 @@ const app = http.createServer((request, response) => {
             <input type="submit" />
           </p>
         </form>`,
-          `<a href="/create">create</a> <a href="/update?id=${title}">update</a>`
+          `<a href="/create">create</a> <a href="/update?id=${topic[0].id}">update</a>`
         );
         response.writeHead(200);
         response.end(html);
@@ -129,15 +173,14 @@ const app = http.createServer((request, response) => {
     });
     request.on('end', () => {
       post = qs.parse(body);
-      const id = post.id;
-      const title = post.title;
-      const description = post.description;
-      fs.rename(`data/${id}`, `data/${title}`, (err) => {
-        fs.writeFile(`data/${title}`, description, 'utf8', (err) => {
-          response.writeHead(302, { Location: `/?id=${title}` });
+      db.query(
+        `UPDATE topic SET title=?, description=?, author_id=1 WHERE id=?`,
+        [post.title, post.description, post.id],
+        (err, result) => {
+          response.writeHead(302, { Location: `/?id=${post.id}` });
           response.end();
-        });
-      });
+        }
+      );
     });
   } else if (pathname === '/delete_process') {
     let body = '';
@@ -147,9 +190,11 @@ const app = http.createServer((request, response) => {
     });
     request.on('end', () => {
       post = qs.parse(body);
-      const id = post.id;
-      const filteredId = path.parse(id).base;
-      fs.unlink(`data/${filteredId}`, (err) => {
+      db.query(`DELETE FROM topic WHERE id=?`, [post.id], (err, result) => {
+        if (err) {
+          throw err;
+        }
+
         response.writeHead(302, { Location: '/' });
         response.end();
       });

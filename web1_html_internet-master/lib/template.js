@@ -46,7 +46,7 @@ module.exports = Object.freeze({
   },
   List: (fileList) => {
     let list = '<ul>';
-    fileList.forEach((element) => (list += `<li><a href="/?id=${element}">${element}</a></li>`));
+    fileList.forEach((element) => (list += `<li><a href="/?id=${element.id}">${element.title}</a></li>`));
     list += '</ul>';
     return list;
   },
