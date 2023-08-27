@@ -129,5 +129,7 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-# zip file
+# zip files
 web1_html_internet-master.zip
+nodejs-master.zip
+/nodejs-master
