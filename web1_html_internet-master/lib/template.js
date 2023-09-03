@@ -50,4 +50,19 @@ module.exports = Object.freeze({
     list += '</ul>';
     return list;
   },
+  AuthorSelect: (authors, author_id) => {
+    let tag = '';
+    authors.forEach((author) => {
+      let selected = '';
+      if (author.id === author_id) {
+        selected = ' selected';
+      }
+      tag += `<option value="${author.id}"${selected}>${author.name}</option>`;
+    });
+    return `
+    <select name="author">
+      ${tag}
+    </select>
+    `;
+  },
 });
