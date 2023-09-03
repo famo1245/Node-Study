@@ -38,6 +38,7 @@ module.exports = Object.freeze({
         </head>
         <body>
           <h1><a href="/">WEB</a></h1>
+          <a href="/author">author</a>
           ${list}
           ${control}
           ${body}
@@ -64,5 +65,25 @@ module.exports = Object.freeze({
       ${tag}
     </select>
     `;
+  },
+  AuthorTable: (authors) => {
+    let tag = '<table>';
+    authors.forEach((author) => {
+      tag += `
+            <tr>
+                <td>${author.name}</td>
+                <td>${author.profile}</td>
+                <td><a href="/author/update?id=${author.id}">update</a></td>
+                <td>
+                  <form action="/author/delete_process" method="post">
+                    <input type="hidden" name="id" value="${author.id}" />
+                    <input type="submit" value="delete" />
+                  </form>
+                </td>
+            </tr>
+        `;
+    });
+    tag += '</table>';
+    return tag;
   },
 });
