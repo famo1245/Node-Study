@@ -27,6 +27,7 @@
 // module.exports = template;
 
 // 위와 동일한 코드
+const sanitizeHtml = require('sanitize-html');
 module.exports = Object.freeze({
   HTML: (title, list, body, control) => {
     return `
@@ -47,7 +48,7 @@ module.exports = Object.freeze({
   },
   List: (fileList) => {
     let list = '<ul>';
-    fileList.forEach((element) => (list += `<li><a href="/?id=${element.id}">${element.title}</a></li>`));
+    fileList.forEach((element) => (list += `<li><a href="/?id=${element.id}">${sanitizeHtml(element.title)}</a></li>`));
     list += '</ul>';
     return list;
   },
@@ -58,7 +59,7 @@ module.exports = Object.freeze({
       if (author.id === author_id) {
         selected = ' selected';
       }
-      tag += `<option value="${author.id}"${selected}>${author.name}</option>`;
+      tag += `<option value="${author.id}"${selected}>${sanitizeHtml(author.name)}</option>`;
     });
     return `
     <select name="author">
@@ -71,8 +72,8 @@ module.exports = Object.freeze({
     authors.forEach((author) => {
       tag += `
             <tr>
-                <td>${author.name}</td>
-                <td>${author.profile}</td>
+                <td>${sanitizeHtml(author.name)}</td>
+                <td>${sanitizeHtml(author.profile)}</td>
                 <td><a href="/author/update?id=${author.id}">update</a></td>
                 <td>
                   <form action="/author/delete_process" method="post">

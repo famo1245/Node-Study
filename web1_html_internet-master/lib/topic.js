@@ -2,6 +2,7 @@ const db = require('./db');
 const template = require('./template');
 const url = require('url');
 const qs = require('querystring');
+const sanitizeHtml = require('sanitize-html');
 
 exports.home = (request, response) => {
   db.query('SELECT * FROM topic', (err, topics) => {
@@ -41,8 +42,8 @@ exports.page = (request, response) => {
         const html = template.HTML(
           title,
           list,
-          `<h2>${title}</h2>
-          <p>${description}</p><p>by ${topic[0].name}</p>`,
+          `<h2>${sanitizeHtml(title)}</h2>
+          <p>${sanitizeHtml(description)}</p><p>by ${sanitizeHtml(topic[0].name)}</p>`,
           `<a href="/create">create</a>
         <a href="/update?id=${queryData.id}">update</a>
         <form action="delete_process" method="post" onsubmit="return confirm('정말로 삭제하시겠습니까?');">
@@ -69,7 +70,7 @@ exports.create = (request, response) => {
       const title = 'WEB - create';
       const list = template.List(topics);
       const html = template.HTML(
-        title,
+        sanitizeHtml(title),
         list,
         `
           <form action="/create_process" method="post">
@@ -136,13 +137,13 @@ exports.update = (request, response) => {
         const description = topic[0].description;
         const list = template.List(topics);
         const html = template.HTML(
-          title,
+          sanitizeHtml(title),
           list,
           `<form action="/update_process" method="post">
             <input type="hidden" name="id" value="${topic[0].id}">
-            <p><input type="text" name="title" placeholder="title" value="${title}" /></p>
+            <p><input type="text" name="title" placeholder="title" value="${sanitizeHtml(title)}" /></p>
             <p>
-              <textarea name="description" placeholder="description" >${description}</textarea>
+              <textarea name="description" placeholder="description" >${sanitizeHtml(description)}</textarea>
             </p>
             <p>
               ${template.AuthorSelect(authors, topic[0].author_id)}

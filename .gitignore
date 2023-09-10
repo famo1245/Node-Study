@@ -133,3 +133,6 @@ dist
 web1_html_internet-master.zip
 nodejs-master.zip
 /nodejs-master
+
+# webstorm
+.idea/
