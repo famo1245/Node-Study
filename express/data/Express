@@ -1,4 +1,4 @@
-Express4.18.1
+
 Fast, unopinionated, minimalist web framework for Node.js
 $ npm install express --save
 Express 5.0 beta documentation is now available.
