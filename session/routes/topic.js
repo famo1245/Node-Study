@@ -1,20 +1,21 @@
-import express from "express";
+import express, { response } from "express";
 import sanitize from "sanitize-html";
 import path from "path";
 import fs from "fs";
 import template from "../lib/template.js";
+import auth from "../lib/auth.js";
 
 export const router = express.Router();
 
-router
-  .post("*", (req, res, next) => {
-    if (!req.isOwner) {
-      res.end("Login required!");
-      return;
-    }
+router.use("*", (req, res, next) => {
+  if (!auth.isOwner(req, res)) {
+    res.redirect("/");
+    return;
+  }
 
-    next();
-  })
+  next();
+});
+router
   .post("/create_process", (req, res) => {
     const post = req.body;
     const { title, description } = post;
@@ -39,7 +40,7 @@ router
         </form>
         `,
       "",
-      req.authStatusUI,
+      auth.statusUI(req, res),
     );
 
     res.send(html);
@@ -65,7 +66,7 @@ router
             </p>
           </form>`,
         `<a href="/topic/create">create</a> <a href="/topic/update/${title}}">update</a>`,
-        req.authStatusUI,
+        auth.statusUI(req, res),
       );
       res.send(html);
     });
@@ -110,7 +111,7 @@ router
                     <input type="hidden" name="id" value="${sanitizedTitle}">
                     <input type="submit" value="delete">
                 </form>`,
-        req.authStatusUI,
+        auth.statusUI(req, res),
       );
 
       res.send(html);

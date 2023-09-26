@@ -25,6 +25,10 @@ app.use("*", (req, res, next) => {
   }
 
   req.isOwner = isOwner;
+
+  if (isOwner) {
+    req.authStatusUI = `<a href="/login/logout_process">logout</a>`;
+  }
   next();
 });
 //get method에만 미들웨어 사용

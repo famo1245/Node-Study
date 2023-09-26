@@ -36,4 +36,19 @@ router
     }
 
     res.end("Who?");
+  })
+  .get("/logout_process", (req, res, next) => {
+    if (!req.isOwner) {
+      res.end("Login required!");
+      return;
+    }
+    res.writeHead(302, {
+      "Set-Cookie": [
+        `email=; Path=/; Max-Age=0`,
+        `password=; Path=/; Max-Age=0`,
+        `nickname=; Path=/; Max-Age=0`,
+      ],
+      Location: "/",
+    });
+    res.end();
   });

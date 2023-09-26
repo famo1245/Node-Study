@@ -14,6 +14,7 @@ router.get("/", (req, res) => {
         <img src="/images/hello.jpg" style="width:300px; display:block; margin-top:10px">
         `,
     `<a href="/topic/create">create</a>`,
+    req.authStatusUI,
   );
   res.send(html);
 });
