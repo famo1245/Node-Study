@@ -5,6 +5,7 @@ import auth from "../lib/auth.js";
 export const router = express.Router();
 
 router.get("/", function (request, response) {
+  console.log("/", request.user);
   const title = "Welcome";
   const description = "Hello, Node.js";
   const list = template.list(request.list);
