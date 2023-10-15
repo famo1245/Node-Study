@@ -4,7 +4,7 @@ const template = {
     list,
     body,
     control,
-    authStatusUI = `<a href="/auth/login">login</a>`,
+    authStatusUI = `<a href="/auth/login">login</a> | <a href="/auth/register">Register</a>`,
   ) {
     return `
         <!doctype html>
