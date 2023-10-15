@@ -1,7 +1,7 @@
 import express from "express";
 import template from "../lib/template.js";
-import fs from "fs";
-import { JSONPreset } from "lowdb/node";
+import { generate } from "shortid";
+import db from "../lib/db.js";
 
 const router = express.Router();
 
@@ -41,6 +41,7 @@ export const initAuthRouter = (passport) => {
     )
     .get("/register", (req, res) => {
       const fmsg = req.flash();
+      console.log(fmsg);
       let feedback = "";
       if (fmsg.error) {
         feedback = fmsg.error[0];
@@ -66,9 +67,27 @@ export const initAuthRouter = (passport) => {
 
       res.send(html);
     })
-    .post("/register_process", (req, res) => {
+    .post("/register_process", async (req, res) => {
       const post = req.body;
       const { email, pwd, pwd2, displayName } = post;
+
+      if (pwd !== pwd2) {
+        req.flash("error", "Password must same!");
+        res.redirect("/auth/register");
+      } else {
+        const user = {
+          id: generate(),
+          email: email,
+          password: pwd,
+          displayName: displayName,
+        };
+        await db.read();
+        db.data.users.push(user);
+        await db.write();
+        req.login(user, (err) => {
+          return res.redirect("/");
+        });
+      }
     })
     // .post("/login_process", (req, res, next) => {
     //   const post = req.body;

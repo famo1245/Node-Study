@@ -1,50 +1,52 @@
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
+import db from "./db.js";
+
 const passportInit = (app) => {
-  const authData = {
-    email: "famo1245",
-    password: "1234",
-    nickname: "young",
-  };
+  const p = passport;
 
-  app.use(passport.initialize());
-  app.use(passport.session());
+  app.use(p.initialize());
+  app.use(p.session());
 
-  passport.serializeUser((user, done) => {
+  p.serializeUser((user, done) => {
     console.log("serialize", user);
-    done(null, user.email);
+    done(null, user.id);
   });
 
-  passport.deserializeUser((id, done) => {
-    console.log("deserialize", id);
-    done(null, authData);
+  p.deserializeUser(async (id, done) => {
+    await db.read();
+    const user = db.data.users.find((element) => {
+      if (element.id === id) {
+        return element;
+      }
+    });
+    console.log("deserialize", id, user);
+    done(null, user);
   });
 
-  passport.use(
+  p.use(
     new LocalStrategy(
       {
         usernameField: "email",
       },
-      (username, password, done) => {
-        console.log("LocalStrategy", username, password);
-        if (username === authData.email) {
-          console.log(1);
-          if (password === authData.password) {
-            console.log(2);
-            return done(null, authData, { message: "Welcome." });
-          } else {
-            console.log(3);
-            return done(null, false, { message: "Incorrect password." });
+      async (email, password, done) => {
+        await db.read();
+        const user = db.data.users.find((element) => {
+          if (element.email === email && element.password === password) {
+            return element;
           }
+        });
+        console.log("LocalStrategy", email, password);
+        if (user) {
+          return done(null, user, { message: "Welcome." });
         } else {
-          console.log(4);
-          return done(null, false, { message: "Incorrect username." });
+          return done(null, false, { message: "Incorrect user information." });
         }
       },
     ),
   );
 
-  return passport;
+  return p;
 };
 
 export default passportInit;

@@ -139,3 +139,6 @@ nodejs-master.zip
 
 # session files
 /session/sessions/
+
+# database
+/session/lib/db.json

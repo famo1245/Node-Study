@@ -28,7 +28,7 @@ app.use(
 );
 app.use(flash());
 // app.get("/flash", (req, res) => {
-//   req.flash("info", "Flash is back!");
+//   req.flash("error", "Flash is back!");
 //   res.send("flash");
 // });
 // app.get("/flash-display", (req, res) => {
