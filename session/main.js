@@ -10,6 +10,7 @@ import { router as topicRouter } from "./routes/topic.js";
 import { router as indexRouter } from "./routes/index.js";
 import { initAuthRouter } from "./routes/auth.js";
 import passportInit from "./lib/passport.js";
+import db from "./lib/db.js";
 
 const app = express();
 const FileStore = store(session);
@@ -40,11 +41,14 @@ app.use(flash());
 const passport = passportInit(app);
 const authRouter = initAuthRouter(passport);
 
-app.get("*", function (request, response, next) {
-  fs.readdir("./data", function (error, filelist) {
-    request.list = filelist;
-    next();
-  });
+app.get("*", async (request, response, next) => {
+  await db.read();
+  request.list = db.data.topics;
+  next();
+  // fs.readdir("./data", function (error, filelist) {
+  //   request.list = filelist;
+  //   next();
+  // });
 });
 
 app.use("/", indexRouter);
