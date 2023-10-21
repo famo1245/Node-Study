@@ -116,19 +116,44 @@ router
         return element;
       }
     });
-    fs.rename(`data/${post.id}`, `data/${post.title}`, (err) => {
-      fs.writeFile(`data/${post.title}`, post.description, "utf8", (err) => {
-        res.redirect(`/topic/${post.title}`);
-      });
-    });
+
+    if (topic.user_id !== req.user.id) {
+      req.flash("error", "Not yours!");
+      return res.redirect("/");
+    }
+
+    topic.title = post.title;
+    topic.description = post.description;
+    await db.write();
+    res.redirect(`/topic/${post.id}`);
+    // fs.rename(`data/${post.id}`, `data/${post.title}`, (err) => {
+    //   fs.writeFile(`data/${post.title}`, post.description, "utf8", (err) => {
+    //     res.redirect(`/topic/${post.title}`);
+    //   });
+    // });
   })
-  .post("/delete_process", (req, res) => {
+  .post("/delete_process", async (req, res) => {
     const post = req.body;
     const id = post.id;
     const filteredId = path.parse(id).base;
-    fs.unlink(`data/${filteredId}`, (err) => {
-      res.redirect("/");
+    await db.read();
+    const topic = db.data.topics.find((element) => {
+      if (element.id === filteredId) {
+        return element;
+      }
     });
+
+    if (topic.user_id !== req.user.id) {
+      req.flash("error", "Not yours!");
+      return res.redirect("/");
+    }
+
+    const idx = db.data.topics.findIndex(
+      (element) => element.id === filteredId,
+    );
+    db.data.topics.splice(idx, 1);
+    await db.write();
+    res.redirect("/");
   })
   .get("/:pageId", async (req, res, next) => {
     const filteredId = path.parse(req.params.pageId).base;
@@ -157,7 +182,7 @@ router
       `<a href="/topic/create">create</a>
                 <a href="/topic/update/${topic.id}">update</a>
                 <form action="/topic/delete_process" method="post">
-                    <input type="hidden" name="id" value="${sanitizedTitle}">
+                    <input type="hidden" name="id" value="${filteredId}">
                     <input type="submit" value="delete">
                 </form>`,
       auth.statusUI(req, res),

@@ -142,3 +142,6 @@ nodejs-master.zip
 
 # database
 /session/lib/db.json
+
+# sensitive info
+/.env

@@ -1,6 +1,7 @@
 import express from "express";
 import template from "../lib/template.js";
 import { generate } from "shortid";
+import { hashSync } from "bcrypt";
 import db from "../lib/db.js";
 
 const router = express.Router();
@@ -75,10 +76,11 @@ export const initAuthRouter = (passport) => {
         req.flash("error", "Password must same!");
         res.redirect("/auth/register");
       } else {
+        const hash = hashSync(pwd, 10);
         const user = {
           id: generate(),
           email: email,
-          password: pwd,
+          password: hash,
           displayName: displayName,
         };
         await db.read();
