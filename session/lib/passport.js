@@ -4,6 +4,7 @@ import { OAuth2Strategy as GoogleStrategy } from "passport-google-oauth";
 import { compare } from "bcrypt";
 import { config } from "dotenv";
 import db from "./db.js";
+import shortid from "shortid";
 
 config();
 
@@ -64,17 +65,57 @@ const passportInit = (app) => {
         clientSecret: process.env.CLIENT_SECRET,
         callbackURL: process.env.CALLBACK_URI,
       },
-      (accessToken, refreshToken, profile, done) => {
-        User.findOrCreate(
-          {
+      async (accessToken, refreshToken, profile, done) => {
+        // console.log("Google Strategy", accessToken, refreshToken, profile);
+        const email = profile.emails[0].value;
+        await db.read();
+        let user = db.data.users.find((element) => {
+          if (element.email === email) {
+            return element;
+          }
+        });
+
+        if (user !== undefined) {
+          user.googleId = profile.id;
+        } else {
+          user = {
+            id: shortid.generate(),
+            email: email,
+            displayName: profile.displayName,
             googleId: profile.id,
-          },
-          (err, user) => {
-            return done(err, user);
-          },
-        );
+          };
+          db.data.users.push(user);
+        }
+        await db.write();
+        done(null, user);
+        // const user =
+        // User.findOrCreate(
+        //   {
+        //     googleId: profile.id,
+        //   },
+        //   (err, user) => {
+        //     return done(err, user);
+        //   },
+        // );
       },
     ),
+  );
+
+  app.get(
+    "/auth/google",
+    p.authenticate("google", {
+      scope: ["https://www.googleapis.com/auth/plus.login", "email"],
+    }),
+  );
+
+  app.get(
+    "/auth/google/callback",
+    p.authenticate("google", {
+      failureRedirect: "/auth/login",
+    }),
+    (req, res) => {
+      res.redirect("/");
+    },
   );
 
   return p;

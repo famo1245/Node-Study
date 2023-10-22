@@ -76,15 +76,26 @@ export const initAuthRouter = (passport) => {
         req.flash("error", "Password must same!");
         res.redirect("/auth/register");
       } else {
-        const hash = hashSync(pwd, 10);
-        const user = {
-          id: generate(),
-          email: email,
-          password: hash,
-          displayName: displayName,
-        };
         await db.read();
-        db.data.users.push(user);
+        const hash = hashSync(pwd, 10);
+        let user = db.data.users.find((element) => {
+          if (element.email === email) {
+            return element;
+          }
+        });
+
+        if (user === undefined) {
+          user = {
+            id: generate(),
+            email: email,
+            password: hash,
+            displayName: displayName,
+          };
+          db.data.users.push(user);
+        } else {
+          user.password = hash;
+          user.displayName = displayName;
+        }
         await db.write();
         req.login(user, (err) => {
           return res.redirect("/");
