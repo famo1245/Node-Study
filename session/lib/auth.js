@@ -4,7 +4,8 @@ const auth = {
   },
 
   statusUI: function (req, res) {
-    let authStatusUI = `<a href="/auth/login">login</a> | <a href="/auth/register">Register</a> | <a href="/auth/google">Login with Google</a>`;
+    let authStatusUI = `<a href="/auth/login">login</a> | <a href="/auth/register">Register</a> 
+| <a href="/auth/google">Login with Google</a> | <a href="/auth/facebook">Login with Facebook</a>`;
     if (this.isOwner(req, res)) {
       authStatusUI = `${req.user.displayName} |  <a href="/auth/logout">logout</a>`;
     }

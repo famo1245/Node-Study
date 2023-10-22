@@ -1,6 +1,7 @@
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import { OAuth2Strategy as GoogleStrategy } from "passport-google-oauth";
+import { Strategy as FacebookStrategy } from "passport-facebook";
 import { compare } from "bcrypt";
 import { config } from "dotenv";
 import db from "./db.js";
@@ -101,6 +102,20 @@ const passportInit = (app) => {
     ),
   );
 
+  p.use(
+    new FacebookStrategy(
+      {
+        clientID: process.env.FACEBOOK_CLIENT_ID,
+        clientSecret: process.env.FACEBOOK_CLIENT_SECRET,
+        callbackURL: process.env.FACEBOOK_CALLBACK_URL,
+        profileFields: ["id", "emails", "name"],
+      },
+      (accessToken, refreshToken, profile, done) => {
+        console.log("Facebook Strategy", accessToken, refreshToken, profile);
+      },
+    ),
+  );
+
   app.get(
     "/auth/google",
     p.authenticate("google", {
@@ -116,6 +131,16 @@ const passportInit = (app) => {
     (req, res) => {
       res.redirect("/");
     },
+  );
+
+  app.get("/auth/facebook", p.authenticate("facebook"));
+
+  app.get(
+    "/auth/facebook/callback",
+    p.authenticate("facebook", {
+      successRedirect: "/",
+      failureRedirect: "/login",
+    }),
   );
 
   return p;
