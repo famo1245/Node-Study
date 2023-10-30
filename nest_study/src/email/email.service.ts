@@ -16,15 +16,14 @@ export class EmailService {
     this.transporter = nodemailer.createTransport({
       service: "Gmail",
       auth: {
-        user: "YOUR_GMAIL",
-        pass: "YOUR_PASSWORD",
+        user: "kandallee38@gmail.com",
+        pass: "loig ohsk dehc jbqi",
       },
     });
   }
 
   async sendMemberJoinVerification(emailAddress: string, signupVerifyToken: string) {
     const baseUrl = "http://localhost:3000";
-
     const url = `${baseUrl}/users/email-verify?signupVerifyToken=${signupVerifyToken}`;
 
     const mailOptions: EmailOptions = {

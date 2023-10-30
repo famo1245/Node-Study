@@ -17,14 +17,14 @@ export class UsersController {
 
   @Post("/email-verify")
   async verifyEmail(@Query() dto: VerifyEmailDto): Promise<string> {
-    console.log(dto);
-    return;
+    const { signupVerifyToken } = dto;
+    return await this.usersService.verifyEmail(signupVerifyToken);
   }
 
   @Post("/login")
   async login(@Body() dto: UserLoginDto): Promise<string> {
-    console.log(dto);
-    return;
+    const { email, password } = dto;
+    return await this.usersService.login(email, password);
   }
 
   // @Header('Custom', 'Test Header')
@@ -33,7 +33,6 @@ export class UsersController {
     // if (+userId < 1) {
     //   throw new BadRequestException('id는 0보다 큰 값이어야 합니다.');
     // }
-    console.log(userId);
-    return;
+    return await this.usersService.getUserInfo(userId);
   }
 }
