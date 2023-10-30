@@ -1,6 +1,6 @@
-import { Injectable } from '@nestjs/common';
-import * as uuid from 'uuid';
-import { EmailService } from '../email/email.service';
+import { Injectable } from "@nestjs/common";
+import * as uuid from "uuid";
+import { EmailService } from "../email/email.service";
 
 @Injectable()
 export class UsersService {
@@ -18,21 +18,13 @@ export class UsersService {
     return false; // TODO: DB 연동 후 구현
   }
 
-  private saveUser(
-    name: string,
-    email: string,
-    password: string,
-    signupVerifyToken: string,
-  ) {
+  private saveUser(name: string, email: string, password: string, signupVerifyToken: string) {
     // TODO: DB 연동 후 구현
     return;
   }
 
   private async sendMemberJoinEmail(email: string, signupVerifyToken: string) {
     // 상용에는 사용하지 말 것
-    await this.emailService.sendMemberJoinVerification(
-      email,
-      signupVerifyToken,
-    );
+    await this.emailService.sendMemberJoinVerification(email, signupVerifyToken);
   }
 }
