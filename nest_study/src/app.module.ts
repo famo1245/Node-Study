@@ -1,4 +1,4 @@
-import { Module } from "@nestjs/common";
+import { MiddlewareConsumer, Module, NestModule } from "@nestjs/common";
 import { UsersModule } from "./users/users.module";
 import { EmailModule } from "./email/email.module";
 import { AppController } from "./app.controller";
@@ -7,6 +7,14 @@ import emailConfig from "./config/emailConfig";
 import { validationSchema } from "./config/validationSchema";
 import { TypeOrmModule } from "@nestjs/typeorm";
 import * as process from "process";
+import { LoggerMiddleware } from "./logger/logger.middleware";
+import { Logger2Middleware } from "./logger/logger2.middleware";
+import { UsersController } from "./users/users.controller";
+import { AuthModule } from "./auth/auth.module";
+import authConfig from "./config/authConfig";
+import * as winston from "winston";
+import { utilities as nestWinstonModuleUtilities, WinstonModule } from "nest-winston";
+
 // import * as process from "process";
 
 // @Module({
@@ -30,12 +38,11 @@ import * as process from "process";
   imports: [
     ConfigModule.forRoot({
       envFilePath: [`${__dirname}/config/env/.${process.env.NODE_ENV}.env`],
-      load: [emailConfig],
+      load: [emailConfig, authConfig],
       isGlobal: true,
       validationSchema,
     }),
     UsersModule,
-    EmailModule,
     TypeOrmModule.forRoot({
       type: "mysql",
       host: process.env.DATABASE_HOST,
@@ -46,8 +53,24 @@ import * as process from "process";
       entities: [__dirname + "/**/*.entity{.ts,.js}"],
       synchronize: process.env.DATABASE_SYNCHRONIZE === "true", // jpa 의 ddl auto 같은거
     }),
+    WinstonModule.forRoot({
+      transports: [
+        new winston.transports.Console({
+          level: process.env.NODE_ENV === "production" ? "info" : "silly",
+          format: winston.format.combine(
+            winston.format.timestamp(),
+            nestWinstonModuleUtilities.format.nestLike("MyApp", { prettyPrint: true }),
+          ),
+        }),
+      ],
+    }),
   ],
-  controllers: [AppController],
+  controllers: [],
   providers: [],
 })
 export class AppModule {}
+// export class AppModule implements NestModule {
+//   configure(consumer: MiddlewareConsumer): any {
+//     consumer.apply(LoggerMiddleware, Logger2Middleware).forRoutes(UsersController);
+//   }
+// }
