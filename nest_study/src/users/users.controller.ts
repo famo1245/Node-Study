@@ -6,6 +6,9 @@ import {
   Header,
   Headers,
   Inject,
+  InternalServerErrorException,
+  Logger,
+  LoggerService,
   Param,
   Post,
   Query,
@@ -34,12 +37,14 @@ export class UsersController {
   constructor(
     private usersService: UsersService,
     private authService: AuthService,
-    @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: WinstonLogger,
+    // @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: LoggerService,
+    @Inject(Logger) private readonly logger: LoggerService,
   ) {}
   @Post()
   async createUser(@Body() dto: CreateUserDto): Promise<void> {
     // console.log(dto);
-    this.printWinstonLog(dto);
+    // this.printWinstonLog(dto);
+    // this.printLoggerService(dto);
     const { name, email, password } = dto;
     await this.usersService.createUser(name, email, password);
   }
@@ -71,19 +76,31 @@ export class UsersController {
     // if (+userId < 1) {
     //   throw new BadRequestException('id는 0보다 큰 값이어야 합니다.');
     // }
-    console.log(user);
     return this.usersService.getUserInfo(userId);
   }
 
-  private printWinstonLog(dto: CreateUserDto) {
-    console.log(dto.name);
+  // private printWinstonLog(dto: CreateUserDto) {
+  //   console.log(dto.name);
+  //
+  //   this.logger.error("error: ", dto);
+  //   this.logger.warn("warn: ", dto);
+  //   this.logger.info("info: ", dto);
+  //   this.logger.http("http: ", dto);
+  //   this.logger.verbose("verbose: ", dto);
+  //   this.logger.debug("debug: ", dto);
+  //   this.logger.silly("silly: ", dto);
+  // }
 
-    this.logger.error("error: ", dto);
-    this.logger.warn("warn: ", dto);
-    this.logger.info("info: ", dto);
-    this.logger.http("http: ", dto);
-    this.logger.verbose("verbose: ", dto);
-    this.logger.debug("debug: ", dto);
-    this.logger.silly("silly: ", dto);
-  }
+  // private printLoggerService(dto: CreateUserDto) {
+  //   try {
+  //     throw new InternalServerErrorException("test");
+  //   } catch (e) {
+  //     this.logger.error("error: " + JSON.stringify(dto), e.stack);
+  //   }
+  //
+  //   this.logger.warn("warn: " + JSON.stringify(dto));
+  //   this.logger.log("log: " + JSON.stringify(dto));
+  //   this.logger.verbose("verbose: " + JSON.stringify(dto));
+  //   this.logger.debug("debug: " + JSON.stringify(dto));
+  // }
 }

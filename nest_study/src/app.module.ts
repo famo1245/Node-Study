@@ -14,6 +14,9 @@ import { AuthModule } from "./auth/auth.module";
 import authConfig from "./config/authConfig";
 import * as winston from "winston";
 import { utilities as nestWinstonModuleUtilities, WinstonModule } from "nest-winston";
+import { APP_FILTER } from "@nestjs/core";
+import { HttpExceptionFilter } from "./exception/http-exception.filter";
+import { ExceptionModule } from "./exception/exception.module";
 
 // import * as process from "process";
 
@@ -64,6 +67,7 @@ import { utilities as nestWinstonModuleUtilities, WinstonModule } from "nest-win
         }),
       ],
     }),
+    ExceptionModule,
   ],
   controllers: [],
   providers: [],
