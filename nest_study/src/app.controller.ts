@@ -5,6 +5,6 @@ import * as process from "process";
 export class AppController {
   @Get()
   getHello(): string {
-    return process.env.DATABASE_HOST;
+    return "Hello";
   }
 }

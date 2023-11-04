@@ -17,6 +17,7 @@ import { utilities as nestWinstonModuleUtilities, WinstonModule } from "nest-win
 import { APP_FILTER } from "@nestjs/core";
 import { HttpExceptionFilter } from "./exception/http-exception.filter";
 import { ExceptionModule } from "./exception/exception.module";
+import { LoggingModule } from "./logger/logging.module";
 
 // import * as process from "process";
 
@@ -68,8 +69,9 @@ import { ExceptionModule } from "./exception/exception.module";
       ],
     }),
     ExceptionModule,
+    LoggingModule,
   ],
-  controllers: [],
+  controllers: [AppController],
   providers: [],
 })
 export class AppModule {}

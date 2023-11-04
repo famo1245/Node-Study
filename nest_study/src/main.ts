@@ -5,6 +5,8 @@ import { logger3 } from "./logger/logger3";
 import * as process from "process";
 import { WINSTON_MODULE_NEST_PROVIDER, WinstonModule, utilities as nestWinstonModuleUtilities } from "nest-winston";
 import * as winston from "winston";
+import { LoggingInterceptor } from "./logger/logging.interceptor";
+import { TransformInterceptor } from "./interceptor/transform.interceptor";
 // import * as dotenv from "dotenv";
 // import * as path from "path";
 // import * as process from "process";
@@ -40,6 +42,7 @@ async function bootstrap() {
   // }
   // app.use(logger3);
   // app.useLogger(app.get(WINSTON_MODULE_NEST_PROVIDER));
+  // app.useGlobalInterceptors(new LoggingInterceptor(), new TransformInterceptor());
   app.useGlobalPipes(
     new ValidationPipe({
       transform: true,

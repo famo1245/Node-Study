@@ -13,6 +13,7 @@ import {
   Post,
   Query,
   UseGuards,
+  UseInterceptors,
 } from "@nestjs/common";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UserLoginDto } from "./dto/user-login.dto";
@@ -26,6 +27,7 @@ import { UserData } from "../decorator/user-data.decorator";
 import { Logger as WinstonLogger } from "winston";
 import { WINSTON_MODULE_PROVIDER } from "nest-winston";
 import * as console from "console";
+import { ErrorsInterceptor } from "../interceptor/errors.interceptor";
 
 interface User {
   name: string;
@@ -68,6 +70,7 @@ export class UsersController {
   }
 
   // @Header('Custom', 'Test Header')
+  // @UseInterceptors(ErrorsInterceptor)
   @UseGuards(AuthGuard)
   @Get("/:id")
   async getUserInfo(@Headers() headers: any, @Param("id") userId: string, @User() user: User): Promise<UserInfo> {
@@ -76,6 +79,7 @@ export class UsersController {
     // if (+userId < 1) {
     //   throw new BadRequestException('id는 0보다 큰 값이어야 합니다.');
     // }
+    // throw new InternalServerErrorException();  // Guard 주석 처리후 인터셉터 등록 후 실행하면 502로 에러가 바뀜
     return this.usersService.getUserInfo(userId);
   }
 
