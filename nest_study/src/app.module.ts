@@ -18,6 +18,7 @@ import { APP_FILTER } from "@nestjs/core";
 import { HttpExceptionFilter } from "./exception/http-exception.filter";
 import { ExceptionModule } from "./exception/exception.module";
 import { LoggingModule } from "./logger/logging.module";
+import { BatchModule } from "./schedule/batch.module";
 
 // import * as process from "process";
 
@@ -70,6 +71,7 @@ import { LoggingModule } from "./logger/logging.module";
     }),
     ExceptionModule,
     LoggingModule,
+    BatchModule,
   ],
   controllers: [AppController],
   providers: [],
