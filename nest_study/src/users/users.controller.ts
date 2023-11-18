@@ -28,6 +28,8 @@ import { Logger as WinstonLogger } from "winston";
 import { WINSTON_MODULE_PROVIDER } from "nest-winston";
 import * as console from "console";
 import { ErrorsInterceptor } from "../interceptor/errors.interceptor";
+import { CommandBus } from "@nestjs/cqrs";
+import { CreateUserCommand } from "./command/create-user.command";
 
 interface User {
   name: string;
@@ -41,6 +43,7 @@ export class UsersController {
     private authService: AuthService,
     // @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: LoggerService,
     @Inject(Logger) private readonly logger: LoggerService,
+    private commandBus: CommandBus,
   ) {}
   @Post()
   async createUser(@Body() dto: CreateUserDto): Promise<void> {
@@ -48,7 +51,11 @@ export class UsersController {
     // this.printWinstonLog(dto);
     // this.printLoggerService(dto);
     const { name, email, password } = dto;
-    await this.usersService.createUser(name, email, password);
+    // await this.usersService.createUser(name, email, password);
+
+    // CQRS 적용
+    const command = new CreateUserCommand(name, email, password);
+    return this.commandBus.execute(command);
   }
 
   @Post("/email-verify")

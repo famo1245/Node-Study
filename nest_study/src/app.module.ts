@@ -19,6 +19,8 @@ import { HttpExceptionFilter } from "./exception/http-exception.filter";
 import { ExceptionModule } from "./exception/exception.module";
 import { LoggingModule } from "./logger/logging.module";
 import { BatchModule } from "./schedule/batch.module";
+import { HealthCheckController } from "./health-check/health-check.controller";
+import { HealthCheckModule } from "./health-check/health-check.module";
 
 // import * as process from "process";
 
@@ -72,6 +74,7 @@ import { BatchModule } from "./schedule/batch.module";
     ExceptionModule,
     LoggingModule,
     BatchModule,
+    HealthCheckModule,
   ],
   controllers: [AppController],
   providers: [],

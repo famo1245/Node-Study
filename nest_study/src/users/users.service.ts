@@ -96,7 +96,7 @@ export class UsersService {
   }
 
   private async sendMemberJoinEmail(email: string, signupVerifyToken: string) {
-    // 상용에는 사용하지 말 것
+    // 상용에는 사용하지 말 것, 외부 이메일 서비스 이용
     await this.emailService.sendMemberJoinVerification(email, signupVerifyToken);
   }
 
