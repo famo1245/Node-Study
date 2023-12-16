@@ -28,8 +28,9 @@ import { Logger as WinstonLogger } from "winston";
 import { WINSTON_MODULE_PROVIDER } from "nest-winston";
 import * as console from "console";
 import { ErrorsInterceptor } from "../interceptor/errors.interceptor";
-import { CommandBus } from "@nestjs/cqrs";
+import { CommandBus, QueryBus } from "@nestjs/cqrs";
 import { CreateUserCommand } from "./command/create-user.command";
+import { GetUserInfoQuery } from "./handler/query/get-user-info.query";
 
 interface User {
   name: string;
@@ -44,6 +45,7 @@ export class UsersController {
     // @Inject(WINSTON_MODULE_PROVIDER) private readonly logger: LoggerService,
     @Inject(Logger) private readonly logger: LoggerService,
     private commandBus: CommandBus,
+    private queryBus: QueryBus,
   ) {}
   @Post()
   async createUser(@Body() dto: CreateUserDto): Promise<void> {
@@ -87,7 +89,11 @@ export class UsersController {
     //   throw new BadRequestException('id는 0보다 큰 값이어야 합니다.');
     // }
     // throw new InternalServerErrorException();  // Guard 주석 처리후 인터셉터 등록 후 실행하면 502로 에러가 바뀜
-    return this.usersService.getUserInfo(userId);
+    // return this.usersService.getUserInfo(userId);
+
+    // CQRS 적용
+    const getUserInfoQuery = new GetUserInfoQuery(userId);
+    return this.queryBus.execute(getUserInfoQuery);
   }
 
   // private printWinstonLog(dto: CreateUserDto) {

@@ -9,10 +9,11 @@ import { AuthModule } from "../auth/auth.module";
 import { CqrsModule } from "@nestjs/cqrs";
 import { CreateUserHandler } from "./handler/create-user.handler";
 import { UserEventsHandler } from "./handler/user-events.handler";
+import { GetUserInfoQueryHandler } from "./handler/get-user-info-query.handler";
 
 @Module({
   imports: [EmailModule, TypeOrmModule.forFeature([UserEntity]), AuthModule, CqrsModule],
   controllers: [UsersController],
-  providers: [Logger, UsersService, CreateUserHandler, UserEventsHandler],
+  providers: [Logger, UsersService, CreateUserHandler, UserEventsHandler, GetUserInfoQueryHandler],
 })
 export class UsersModule {}
