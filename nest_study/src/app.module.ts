@@ -9,7 +9,7 @@ import { TypeOrmModule } from "@nestjs/typeorm";
 import * as process from "process";
 import { LoggerMiddleware } from "./logger/logger.middleware";
 import { Logger2Middleware } from "./logger/logger2.middleware";
-import { UsersController } from "./users/users.controller";
+import { UsersController } from "./users/interface/users.controller";
 import { AuthModule } from "./auth/auth.module";
 import authConfig from "./config/authConfig";
 import * as winston from "winston";

@@ -17,20 +17,20 @@ import {
 } from "@nestjs/common";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UserLoginDto } from "./dto/user-login.dto";
-import { UserInfo } from "./UserInfo";
+import { UserInfo } from "./user-info";
 import { VerifyEmailDto } from "./dto/verify-email.dto";
-import { UsersService } from "./users.service";
-import { AuthService } from "../auth/auth.service";
-import { AuthGuard } from "../auth.guard";
-import { User } from "../decorator/user.decorator";
-import { UserData } from "../decorator/user-data.decorator";
+import { UsersService } from "../users.service";
+import { AuthService } from "../../auth/auth.service";
+import { AuthGuard } from "../../auth.guard";
+import { User } from "../../decorator/user.decorator";
+import { UserData } from "../../decorator/user-data.decorator";
 import { Logger as WinstonLogger } from "winston";
 import { WINSTON_MODULE_PROVIDER } from "nest-winston";
 import * as console from "console";
-import { ErrorsInterceptor } from "../interceptor/errors.interceptor";
+import { ErrorsInterceptor } from "../../interceptor/errors.interceptor";
 import { CommandBus, QueryBus } from "@nestjs/cqrs";
-import { CreateUserCommand } from "./command/create-user.command";
-import { GetUserInfoQuery } from "./handler/query/get-user-info.query";
+import { CreateUserCommand } from "../application/command/create-user.command";
+import { GetUserInfoQuery } from "../application/query/get-user-info.query";
 
 interface User {
   name: string;

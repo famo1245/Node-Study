@@ -1,13 +1,13 @@
 import { IQueryHandler, QueryHandler } from "@nestjs/cqrs";
-import { GetUserInfoQuery } from "./query/get-user-info.query";
+import { GetUserInfoQuery } from "./get-user-info.query";
 import { InjectRepository } from "@nestjs/typeorm";
-import { UserEntity } from "../entity/user.entity";
+import { UserEntity } from "../../infra/db/entity/user.entity";
 import { Repository } from "typeorm";
-import { UserInfo } from "../UserInfo";
+import { UserInfo } from "../../interface/user-info";
 import { NotFoundException } from "@nestjs/common";
 
 @QueryHandler(GetUserInfoQuery)
-export class GetUserInfoQueryHandler implements IQueryHandler<GetUserInfoQuery> {
+export class GetUserInfoHandler implements IQueryHandler<GetUserInfoQuery> {
   constructor(@InjectRepository(UserEntity) private userRepository: Repository<UserEntity>) {}
 
   async execute(query: GetUserInfoQuery): Promise<UserInfo> {
